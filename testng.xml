@@ -6,8 +6,8 @@
 			<class name="test.java.com.answerconnect.deployment.testcases.Sign_In_Anct" />
 			<class name="test.java.com.answerconnect.deployment.testcases.StatusBar" />
 			<class name="test.java.com.answerconnect.deployment.testcases.InboxTab" />
-			<class name="test.java.com.answerconnect.deployment.testcases.MoreTab" />
 			<class name="test.java.com.answerconnect.deployment.testcases.CallsTab" />
+			<class name="test.java.com.answerconnect.deployment.testcases.MoreTab" />
 		</classes>
 	</test> <!-- Test -->
 </suite> <!-- Suite -->
