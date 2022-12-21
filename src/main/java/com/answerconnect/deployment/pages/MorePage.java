@@ -1,7 +1,5 @@
 package main.java.com.answerconnect.deployment.pages;
 
-import static org.testng.Assert.assertNotEquals;
-
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
@@ -65,7 +63,7 @@ public class MorePage extends BasePages {
 	@AndroidFindBy(xpath = "//*[@text='United States']")
 	private WebElement UnitedStates;
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/save_contact_tv")
-	private WebElement saveEditContact;
+	private WebElement saveEditContactOrProfile;
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/ProfilePhoneNoTV")
 	private WebElement phoneNumberOverview;
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/PhoneNoRow")
@@ -132,38 +130,171 @@ public class MorePage extends BasePages {
 	private WebElement loginEmail;
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/edt_password")
 	private WebElement loginPassword;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/ProfileNameTV")
-	private WebElement profileNameView;
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/btn_login")
+	private WebElement loginButton;
+	@AndroidFindBy(xpath = "//*[@text='Help and Support']")
+	private WebElement helpAndSupportView;
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/ProfileEditIV")
 	private WebElement profileEditButton;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/profilePositionTV")
-	private WebElement designationView;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/profileEmailTV")
-	private WebElement emailView;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/profilePhoneNoTV")
-	private WebElement phoneView;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/ProfilePhoneNoTV")
-	private WebElement phoneInside;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/ProfileEmailTv")
-	private WebElement emailInside;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/ProfileMoreIv")
-	private WebElement moreOptionInside;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/EditProfileNameParent")
+	@AndroidFindBy(xpath = "//*[@resource-id='com.answerconnect.mobile:id/EditProfileNameParent']/*[@resource-id='com.answerconnect.mobile:id/EditProfileNameET']")
 	private WebElement editProfileName;
-	@AndroidFindBy(id = "com.answerconnect.mobile:id/EditProfilePositionParent")
-	private WebElement editPosition;
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/EditProfilePositionET")
+	private WebElement editProfilePosition;
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/ProfileNameTV")
+	private WebElement profileNameOverview;
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/profilePositionTV")
+	private WebElement profilePositionOverview;
+	@AndroidFindBy(xpath = "//*[@resource-id='com.answerconnect.mobile:id/EditProfileHeaderNameTV']/*[@resource-id='com.answerconnect.mobile:id/EditProfileEmailEditTV']")
+	private WebElement editProfilePrimaryEmail;
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/profileEmailTV")
+	private WebElement primaryEmailOverview;
+	@AndroidFindBy(xpath = "//*[@resource-id='com.answerconnect.mobile:id/EditProfileNameET']/*[@resource-id='com.answerconnect.mobile:id/EditProfileEmailEditTV']")
+	private WebElement editProfileSecEmail;
+	@AndroidFindBy(xpath = "//*[@resource-id='com.answerconnect.mobile:id/EditProfileNameErrorTV']/*[@resource-id='com.answerconnect.mobile:id/EditProfileEmailEditTV']")
+	private WebElement editProfileThirdEmail;
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/EditProfileAddEmailIv")
+	private WebElement editProfileAddEmailIcon;
+	@AndroidFindBy(xpath = "//*[@resource-id='com.answerconnect.mobile:id/EditProfileAddEmailIv']/*[@resource-id='com.answerconnect.mobile:id/ProfileNumberEditTV']")
+	private WebElement editProfilePhNum1;
+	@AndroidFindBy(xpath = "//*[@resource-id='com.answerconnect.mobile:id/EditProfileAddEmailIv']/*[@resource-id='com.answerconnect.mobile:id/country_iv']")
+	private WebElement EPCountryCodePh1;
+	@AndroidFindBy(xpath = "//*[@resource-id='com.answerconnect.mobile:id/EditProfileCollabImage']/*[@resource-id='com.answerconnect.mobile:id/ProfileNumberEditTV']")
+	private WebElement editProfilePhNum2;
+	@AndroidFindBy(xpath = "//*[@resource-id='com.answerconnect.mobile:id/EditProfileCollabImage']/*[@resource-id='com.answerconnect.mobile:id/country_iv']")
+	private WebElement EPCountryCodePhNum2;
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/addPhoneLayoutIV")
+	private WebElement editProfileAddPhNumIcon;
 
 	public void more() throws InterruptedException {
 
-		// My Profile
-//		tapOn("More tab", moreTab);
-//		tapOn("Edit icon", profileEditButton);
-//		
-//		
-//		
-//		
-
 		tapOn("More tab", moreTab);
+		// My Profile existing names validation
+		try {
+			String nameOut = profileNameOverview.getText().trim();
+			String positionOut = profilePositionOverview.getText().trim();
+			String primEmailOut = primaryEmailOverview.getText().trim();
+			tapOn("Edit profile", profileEditButton);
+			String nameIn = editProfileName.getText().trim();
+			String positionIn = editProfilePosition.getText().trim();
+			String primEmailIn = editProfilePrimaryEmail.getText().trim();
+			assertEqualsString(nameOut, nameIn, "Existing name validation");
+			assertEqualsString(positionOut, positionIn, "Existing position validation");
+			assertEqualsString(primEmailOut, primEmailIn, "Existing primary email validation");
+		} catch (Exception e) {
+			e.printStackTrace();
+			test.log(LogStatus.FAIL, "Existing change validation failed");
+		}
+
+		// My Profile
+		tapOn("name field", editProfileName);
+		editProfileName.clear();
+		sendKeys(editProfileName, getRandomName(), "Profile name");
+		hideKeyboard();
+		tapOn("Position field", editProfilePosition);
+		editProfilePosition.clear();
+		sendKeys(editProfilePosition, "QA Engineer", "Position name");
+		hideKeyboard();
+		try {
+			if (editProfileSecEmail.isDisplayed()) {
+				tapOn("2nd Email field", editProfileSecEmail);
+				editProfileSecEmail.clear();
+				sendKeys(editProfileSecEmail, getRandomEmail(), "2nd Email");
+				hideKeyboard();
+				test.log(LogStatus.PASS, "Entered 2nd email without add icon");
+			}
+		} catch (Exception e) {
+			tapOn("Add email", editProfileAddEmailIcon);
+			tapOn("2nd Email field", editProfileSecEmail);
+			editProfileSecEmail.clear();
+			sendKeys(editProfileSecEmail, getRandomEmail(), "2nd Email");
+			hideKeyboard();
+			test.log(LogStatus.PASS, "Entered 2nd email with add icon");
+		}
+
+		try {
+			if (editProfileThirdEmail.isDisplayed()) {
+				tapOn("3rd email field", editProfileThirdEmail);
+				editProfileThirdEmail.clear();
+				sendKeys(editProfileThirdEmail, getRandomEmail(), "3rd email");
+				hideKeyboard();
+				test.log(LogStatus.PASS, "Entered 3rd email without add icon");
+			}
+		} catch (Exception e) {
+			tapOn("Add email", editProfileAddEmailIcon);
+			tapOn("3rd email field", editProfileThirdEmail);
+			editProfileThirdEmail.clear();
+			sendKeys(editProfileThirdEmail, getRandomEmail(), "3rd email");
+			hideKeyboard();
+			test.log(LogStatus.PASS, "Entered 3rd email with add icon");
+		}
+
+		try {
+			if (editProfilePhNum1.isDisplayed()) {
+				tapOn("1st phone field", editProfilePhNum1);
+				editProfilePhNum1.clear();
+				sendKeys(editProfilePhNum1, getRandomPhNum(), "1st phone number");
+				hideKeyboard();
+				tapOn("Country code 1", EPCountryCodePh1);
+				tapOn("United States", UnitedStates);
+				test.log(LogStatus.PASS, "Entered 1st phone number without add icon");
+			}
+		} catch (Exception e) {
+			tapOn("Add Phone", editProfileAddPhNumIcon);
+			tapOn("1st phone field", editProfilePhNum1);
+			editProfilePhNum1.clear();
+			sendKeys(editProfilePhNum1, getRandomPhNum(), "1st phone number");
+			hideKeyboard();
+			tapOn("Country code 1", EPCountryCodePh1);
+			tapOn("United States", UnitedStates);
+			test.log(LogStatus.PASS, "Entered 1st phone number with add icon");
+		}
+
+		try {
+			if (editProfilePhNum2.isDisplayed()) {
+				tapOn("2nd phone field", editProfilePhNum2);
+				editProfilePhNum2.clear();
+				sendKeys(editProfilePhNum2, getRandomPhNum(), "2nd phone number");
+				hideKeyboard();
+				tapOn("Country Code 2", EPCountryCodePhNum2);
+				tapOn("United States", UnitedStates);
+				test.log(LogStatus.PASS, "Entered 2nd phone number without add icon");
+			}
+		} catch (Exception e) {
+			tapOn("Add Phone", editProfileAddPhNumIcon);
+			tapOn("2nd phone field", editProfilePhNum2);
+			editProfilePhNum2.clear();
+			sendKeys(editProfilePhNum2, getRandomPhNum(), "2nd phone number");
+			hideKeyboard();
+			tapOn("Country Code 2", EPCountryCodePhNum2);
+			tapOn("United States", UnitedStates);
+			test.log(LogStatus.PASS, "Entered 2nd phone number with add icon");
+		}
+		scrollUntil("Save");
+
+		try {
+			if (saveEditContactOrProfile.isDisplayed()) {
+				tapOn("Save", saveEditContactOrProfile);
+				assertEquals(toastMessage, "Updated Successfully", "Profile saved successfully");
+			}
+		} catch (Exception e) {
+			assertEquals(toastMessage, "Updated Successfully", "Profile saved successfully");
+		}
+
+		// My Profile new names
+		try {
+			String nameOutNew = profileNameOverview.getText().trim();
+			String positionOutNew = profilePositionOverview.getText().trim();
+			tapOn("Edit profile", profileEditButton);
+			String nameInNew = editProfileName.getText().trim();
+			String positionInNew = editProfilePosition.getText().trim();
+			assertEqualsString(nameInNew, nameOutNew, "New name validation");
+			assertEqualsString(positionOutNew, positionInNew, "New position validation");
+			goBack();
+		} catch (Exception e) {
+			e.printStackTrace();
+			test.log(LogStatus.FAIL, "New change validation failed");
+		}
+
 		// Teleport
 		try {
 			tapOn("Teleport", myTeleportOption);
@@ -225,7 +356,6 @@ public class MorePage extends BasePages {
 			test.log(LogStatus.INFO, "Email ID is not available");
 		}
 		goBack();
-		//goBack();
 
 		// My Directory (Contacts)
 		tapOn("Contacts", contactsOption);
@@ -248,7 +378,7 @@ public class MorePage extends BasePages {
 			tapOn("Change country code", countryCode);
 			tapOn("United States", UnitedStates);
 			tapOn("Add more Ph", contactAddPhNum);
-			tapOn("Save contact", saveEditContact);
+			tapOn("Save contact", saveEditContactOrProfile);
 			assertEquals(toastMessage, "Updated successfully", "Contact edited successfully");
 		} catch (Exception e) {
 			test.log(LogStatus.FAIL, "Contact edit failed");
@@ -272,14 +402,15 @@ public class MorePage extends BasePages {
 				tapOn("Email", emailOverview);
 				longPress("Email ID", email_phBottomSheet);
 				test.log(LogStatus.PASS, "Email is copied to clipboard");
+				goBack();
 			} else {
 				test.log(LogStatus.FAIL, "Email ID copy failed");
 			}
 		} catch (Exception e) {
 			test.log(LogStatus.INFO, "Email ID is not available");
 		}
-		goBack();
-		goBack();
+
+		pressBackUntil(createNewContact_MyDir);
 
 		tapOn("New Contact", createNewContact_MyDir);
 		try {
@@ -362,7 +493,7 @@ public class MorePage extends BasePages {
 			test.log(LogStatus.FAIL, "Chat support message failed");
 		}
 
-		goBack();
+		pressBack(helpAndSupportView);
 
 		// Logout
 		scrollInto("Logout");
@@ -370,6 +501,7 @@ public class MorePage extends BasePages {
 			assertEqualsString(logoutTitle.getText(), "Logout", "Logout view succeeded");
 		} catch (Exception e) {
 			test.log(LogStatus.FAIL, "Logout title mismatch");
+			getBase64();
 		}
 
 		try {
@@ -379,14 +511,18 @@ public class MorePage extends BasePages {
 			assertEqualsString(log, logoutTitle.getText(), "Logout 'no' passed");
 		} catch (Exception e) {
 			test.log(LogStatus.FAIL, "Logout 'no' failed");
+			getBase64();
 		}
 
 		try {
-			// String logYes = logoutYes.getText();
 			tapOn("Yes", logoutYes);
-			assertNotEquals(loginEmail.getText(), loginPassword.getText(), "Logout success");
+			if (loginButton.isDisplayed()) {
+				test.log(LogStatus.PASS, "Logout passed");
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			test.log(LogStatus.FAIL, "Logout failed");
+			getBase64();
 		}
 	}
 

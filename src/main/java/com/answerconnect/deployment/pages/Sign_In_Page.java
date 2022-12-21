@@ -3,14 +3,12 @@ package main.java.com.answerconnect.deployment.pages;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
-import com.relevantcodes.extentreports.ExtentTest;
-
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 
 public class Sign_In_Page extends BasePages {
 
-	public Sign_In_Page(ExtentTest test) {
+	public Sign_In_Page() {
 		PageFactory.initElements(new AppiumFieldDecorator(driver), this);
 
 	}
@@ -30,17 +28,33 @@ public class Sign_In_Page extends BasePages {
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/toolbar_heading")
 	public WebElement header;
 
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/agreed_button")
+	public WebElement grantPermission;
+
+	@AndroidFindBy(xpath = "//android.widget.Button[@text='Allow']")
+	public WebElement allow;
+
 	public void signIn() throws InterruptedException {
 
-		// tapOn("Email Id field", emailId);
 		sendKeys(emailId, prop.getProperty("emailId"), "email id field");
-		// tapOn("Password field", password);
 		sendKeys(password, prop.getProperty("password"), "password field");
 		tapOn("Login button", login);
 		wait(skipTourPage);
 		tapOn("Skip", skipTourPage);
+		try {
+			if (grantPermission.isDisplayed()) {
+				tapOn("Grant permission", grantPermission);
+				tapOn("Allow", allow);
+				tapOn("Grant permission", grantPermission);
+				tapOn("Allow", allow);
+			}
+		} catch (Exception e) {
+			System.out.println("No permission needed");
+		}
+
 		wait(header);
 		assertEquals(header, "Inbox", "User Logged into the app successfully");
+		getBase64();
 
 	}
 }

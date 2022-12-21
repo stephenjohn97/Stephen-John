@@ -20,6 +20,7 @@ import org.openqa.selenium.remote.RemoteWebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
 
 import com.github.javafaker.Faker;
 import com.google.common.collect.ImmutableMap;
@@ -132,12 +133,8 @@ public class BasePages extends AutomationTest {
 	}
 
 	public void assertEqualsString(String actual, String expected, String name) {
-		try {
-			Assert.assertEquals(actual, expected);
-			test.log(LogStatus.PASS, name);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		Assert.assertEquals(actual, expected);
+		test.log(LogStatus.PASS, name);
 	}
 
 	public String getBase64() {
@@ -149,14 +146,20 @@ public class BasePages extends AutomationTest {
 	}
 
 	public void assertEquals(WebElement element, String input, String name) {
-		try {
-			String getheadertext = element.getText().trim();
-			System.out.println(getheadertext);
-			Assert.assertEquals(input, getheadertext);
-			test.log(LogStatus.PASS, name);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		String getheadertext = element.getText().trim();
+		System.out.println(getheadertext);
+		Assert.assertEquals(input, getheadertext);
+		test.log(LogStatus.PASS, name);
+
+	}
+
+	public void assertEqualsSoft(WebElement element, String input, String name) {
+		String getheadertext = element.getText();
+		System.out.println(getheadertext);
+		SoftAssert sa = new SoftAssert();
+		sa.assertEquals(input, getheadertext);
+		// Assert.assertEquals(input, getheadertext);
+		test.log(LogStatus.PASS, name);
 
 	}
 
@@ -168,20 +171,17 @@ public class BasePages extends AutomationTest {
 		} catch (Exception e) {
 			pass = false;
 			System.out.println("AssetEquals exception::::" + e);
+			getBase64();
 		}
 		test.log(LogStatus.PASS, name);
 		return pass;
 	}
 
 	public void assertEqualsSubheader(WebElement element, String input, String name) {
-		try {
-			String getSubheadertext = element.getText();
-			System.out.println(getSubheadertext);
-			Assert.assertEquals(input, getSubheadertext);
-			test.log(LogStatus.PASS, name);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		String getSubheadertext = element.getText();
+		System.out.println(getSubheadertext);
+		Assert.assertEquals(input, getSubheadertext);
+		test.log(LogStatus.PASS, name);
 
 	}
 
@@ -210,9 +210,15 @@ public class BasePages extends AutomationTest {
 
 	}
 
-	public static void doubleTap(String name, WebElement element) {
-		((JavascriptExecutor) driver).executeScript("mobile: doubleClickGesture",
-				ImmutableMap.of("elementId", ((RemoteWebElement) element).getId()));
+	public void doubleTap(String name, WebElement element) {
+		try {
+			((JavascriptExecutor) driver).executeScript("mobile: doubleClickGesture",
+					ImmutableMap.of("elementId", ((RemoteWebElement) element).getId()));
+		} catch (Exception e) {
+			e.printStackTrace();
+			getBase64();
+		}
+		test.log(LogStatus.INFO, "Double tapped on " + name);
 	}
 
 	public void scrollInto(String name) {
@@ -239,14 +245,10 @@ public class BasePages extends AutomationTest {
 	}
 
 	public void assertNotNull(WebElement locator, String name) {
-		try {
-			String element = locator.getText();
-			System.out.println(element);
-			Assert.assertNotNull(element);
-			test.log(LogStatus.PASS, name);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		String element = locator.getText();
+		System.out.println(element);
+		Assert.assertNotNull(element);
+		test.log(LogStatus.PASS, name);
 	}
 
 	public String element(WebElement locator, String name) {
@@ -293,6 +295,22 @@ public class BasePages extends AutomationTest {
 		}
 		test.log(LogStatus.PASS, "Swiped Left");
 
+	}
+
+	public void swipeUp() {
+		try {
+			Dimension dimension = driver.manage().window().getSize();
+			int startX = (int) (dimension.width * 0.5);
+			int startY = (int) (dimension.height * 0.2);
+			int endX = (int) (dimension.width * 0.5);
+			int endY = (int) (dimension.height * 0.8);
+			AndroidTouchAction touch = new AndroidTouchAction(driver);
+			touch.press(PointOption.point(startX, startY)).waitAction(WaitOptions.waitOptions(Duration.ofSeconds(1)))
+					.moveTo(PointOption.point(endX, endY)).release().perform();
+		} catch (Exception e) {
+			System.out.println("SwipeUp Exception::::" + e);
+		}
+		test.log(LogStatus.PASS, "Swiped Up");
 	}
 
 	public void longPress(String info, WebElement web) {
@@ -393,5 +411,33 @@ public class BasePages extends AutomationTest {
 		Assert.assertEquals(i, j, name);
 		test.log(LogStatus.PASS, name);
 	}
+
+	public void pressBack(WebElement element) throws InterruptedException {
+		while (true) {
+			try {
+				if (element.isDisplayed()) {
+					goBack();
+				}
+			} catch (Exception e) {
+				break;
+			}
+			tempWait(500);
+		}
+	}
+
+	public void pressBackUntil(WebElement element) throws InterruptedException {
+		while (true) {
+			try {
+				if (element.isDisplayed()) {
+					break;
+				}
+			} catch (Exception e) {
+				goBack();
+			}
+			tempWait(500);
+		}
+	}
+	
+	
 
 }

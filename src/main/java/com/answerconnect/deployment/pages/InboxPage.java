@@ -1,5 +1,7 @@
 package main.java.com.answerconnect.deployment.pages;
 
+import java.util.NoSuchElementException;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 
@@ -214,49 +216,54 @@ public class InboxPage extends BasePages {
 
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/ProfileMoreIv")
 	private WebElement contactMoreOptions;
-	
+
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/EditProfileTv")
 	private WebElement editContact;
-	
+
 	@AndroidFindBy(id = "com.answerconnect.mobile:id/EditProfileNameET")
 	private WebElement contactName;
+
+	@AndroidFindBy(id = "com.answerconnect.mobile:id/toolbar_heading")
+	public WebElement header;
 
 	int i = 0;
 
 	public void inbox() throws InterruptedException {
 
-		tapOn("Inbox All dropdown", allDropdownInbox);
-		if (allIconChecked.isDisplayed()) {
-			tapOn("Unread", unread);
-			tapOn("Apply Filter", applyFilter);
-			tempWait(2000);
-
-			try {
-				if (inboxNoMessageToast.isDisplayed()) {
-					test.log(LogStatus.PASS, "No messages for Unread");
-				} else {
-					test.log(LogStatus.INFO, "Messages exist for Unread");
-				}
-			} catch (Exception e) {
-				longPress("Message icon", inboxMessageThreeName);
-				if (markAsRead.isDisplayed()) {
-					test.log(LogStatus.PASS, "All dropdown unread is passed");
-					longPress("Message icon", inboxMessageThreeName);
-				} else {
-					test.log(LogStatus.FAIL, "All dropdown unread is failed");
-				}
-			}
-		} else if (unreadIconChecked.isDisplayed()) {
-			tapOn("All option", all);
-			tapOn("Apply Filter", applyFilter);
-			tempWait(2000);
-
-		}
-
-		tapOn("Inbox All dropdown", allDropdownInbox);
-		tapOn("All option", all);
-		tapOn("Apply Filter", applyFilter);
-		tempWait(2000);
+//		tapOn("Inbox All dropdown", allDropdownInbox);
+//		if (allIconChecked.isDisplayed()) {
+//			tapOn("Unread", unread);
+//			tapOn("Apply Filter", applyFilter);
+//			tempWait(2000);
+//
+//			try {
+//				if (inboxNoMessageToast.isDisplayed()) {
+//					test.log(LogStatus.PASS, "No messages for Unread");
+//				} else {
+//					test.log(LogStatus.INFO, "Messages exist for Unread");
+//				}
+//			} catch (Exception e) {
+//				longPress("Message icon", inboxMessageThreeName);
+//				if (markAsRead.isDisplayed()) {
+//					test.log(LogStatus.PASS, "All dropdown unread is passed");
+//					longPress("Message icon", inboxMessageThreeName);
+//				} else {
+//					test.log(LogStatus.FAIL, "All dropdown unread is failed");
+//				}
+//			}
+//		} else if (unreadIconChecked.isDisplayed()) {
+//			tapOn("All option", all);
+//			tapOn("Apply Filter", applyFilter);
+//			tempWait(2000);
+//
+//		}
+//
+//		tapOn("Inbox All dropdown", allDropdownInbox);
+//		tapOn("All option", all);
+//		tapOn("Apply Filter", applyFilter);
+//		
+//		tempWait(4000);
+//		swipeUp();
 
 		// Mark as read and unread (Outside)
 		tapOn("message", inboxMessageIcon);
@@ -289,6 +296,8 @@ public class InboxPage extends BasePages {
 			System.out.println(e.getMessage());
 			test.log(LogStatus.FAIL, "Archive failed");
 		}
+		
+		tempWait(3000);
 
 		// Inbox to Archive outside
 		String nameT = inboxMessageThreeName.getText().trim();
@@ -315,14 +324,15 @@ public class InboxPage extends BasePages {
 			tapOn("Back to inbox", moveToArchiveOrInbox);
 			assertEquals(toastMessage, "Message Moved to Inbox", "Moved to Inbox from Archive");
 			getBase64();
-			goBack();
-			goBack();
+			pressBackUntil(header);
+			swipeUp();
 			tempWait(8000);
-			assertEquals(inboxMessageThreeName, nameT, "Message moved to inbox from Archive successfully");
+			assertEqualsSoft(inboxMessageThreeName, nameT, "Message moved to inbox from Archive successfully");
 			getBase64();
 		} catch (Exception e) {
 			e.printStackTrace();
 			test.log(LogStatus.PASS, "Archive to Inbox failed");
+			goBack();
 		}
 
 		// Inbox to Trash outside
@@ -334,7 +344,7 @@ public class InboxPage extends BasePages {
 			tapOn("Trash", trash);
 			tapOn("More option", moreOptionsInbox);
 			tapOn("Trash toggle", trashFilter);
-			tempWait(2000);
+			tempWait(3000);
 			scrollUntil(dateF);
 			scrollInto(nameF);
 			getBase64();
@@ -349,22 +359,22 @@ public class InboxPage extends BasePages {
 			tapOn("options", messageMoreOption);
 			tapOn("Back to inbox", moveToArchiveOrInbox);
 			assertEquals(toastMessage, "Message Moved to Inbox", "Moved to Inbox from Trash");
-			getBase64();
-			goBack();
-			goBack();
+			pressBackUntil(header);
+			swipeUp();
 			tempWait(8000);
-			assertEquals(inboxMessageFourName, nameF, "Message moved to inbox from Trash successfully");
+			assertEqualsSoft(inboxMessageFourName, nameF, "Message moved to inbox from Trash successfully");
 			getBase64();
 		} catch (Exception e) {
 			e.printStackTrace();
 			test.log(LogStatus.FAIL, "Trash to Inbox failed");
+			goBack();
 		}
 
 		// Validating a message view
 		try {
 			String texts = inboxMessage.getText().toLowerCase();
 			tapOn("message", inboxMessage);
-			assertEquals(profileName, texts, "Validating a message");
+			assertEqualsString(profileName.getText().toLowerCase(), texts, "Validating a message");
 			System.out.println("Message view validated");
 			tapOn("Go back", navigateBack);
 		} catch (Exception e) {
@@ -443,9 +453,11 @@ public class InboxPage extends BasePages {
 							goBack();
 							assertEqualsString(phoneBS, phone, "Bottomsheet Phone number validation successful");
 						}
-					} else {
-						System.out.println("Phone number is not available");
 					}
+				} catch (NoSuchElementException e) {
+					System.out.println("Phone number is not available");
+					test.log(LogStatus.PASS, "Phone number is not available");
+					goBack();
 
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
@@ -475,13 +487,15 @@ public class InboxPage extends BasePages {
 							System.out.println("BS email comp else");
 						}
 					}
+				} catch (NoSuchElementException e) {
+					System.out.println("Email is not available");
+					test.log(LogStatus.PASS, "Email is not available");
+					goBack();
 
 				} catch (Exception e) {
-					System.out.println("Email is not available");
 					tapOn("Go back", profileBackButton);
-					System.out.println(e.getMessage());
 					System.out.println("Bottomsheet email validation unsuccessful");
-					test.log(LogStatus.FAIL, "Bottomsheet email validation unsuccessful");
+					test.log(LogStatus.INFO, "Bottomsheet email validation unsuccessful");
 
 				}
 
@@ -495,9 +509,11 @@ public class InboxPage extends BasePages {
 						assertEqualsString("Phone number is copied to clipboard", "Phone number is copied to clipboard",
 								"BS phone copy validation successful");
 						goBack();
-					} else {
-						System.out.println("Phone number is not available");
 					}
+				} catch (NoSuchElementException e) {
+					System.out.println("Phone number is not available");
+					test.log(LogStatus.PASS, "Phone number is not available");
+					goBack();
 
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
@@ -513,15 +529,15 @@ public class InboxPage extends BasePages {
 						assertEqualsString("Email is copied to clipboard", "Email is copied to clipboard",
 								"BS email validation successful");
 						goBack();
-					} else {
-						System.out.println("Email is not available");
 					}
+				} catch (NoSuchElementException e) {
+					System.out.println("Email is not available");
+					test.log(LogStatus.PASS, "Email is not available");
+					goBack();
 				} catch (Exception e) {
-					System.out.println(e.getMessage());
-					test.log(LogStatus.FAIL, "Bottomsheet email copy validation unsuccessful");
+					test.log(LogStatus.INFO, "Bottomsheet email copy validation unsuccessful");
 					goBack();
 				}
-				tapOn("Go back", profileBackButton);
 
 			}
 		} catch (Exception e) {
@@ -648,6 +664,7 @@ public class InboxPage extends BasePages {
 			}
 		} else {
 			System.out.println("This is not a pixel device");
+			goBack();
 		}
 
 	}

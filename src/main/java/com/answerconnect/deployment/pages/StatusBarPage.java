@@ -157,20 +157,20 @@ public class StatusBarPage extends BasePages {
 			test.log(LogStatus.FAIL, "On Vacation (1 week) is failed");
 		}
 
-		// custom
-		try {
-			tapOn("Status arrow", statusBarArrow);
-			tapOn("Custom", customStatus);
-			sendKeys(customStatusTitle, prop.getProperty("CustomStatus"), "Custom Title");
-			hideKeyboard();
-			tapOn("CustomTime", custom);
-			timePicker(prop.getProperty("TimePickerHour"));
-			tapOn("Done", statusDone);
-			assertEquals(otherStatuses, "On leave indefinitely", "Verified 'On leave indefinitely' successfully");
-		} catch (Exception e) {
-			test.log(LogStatus.FAIL, "Custom is failed");
-
-		}
+//		// custom
+//		try {
+//			tapOn("Status arrow", statusBarArrow);
+//			tapOn("Custom", customStatus);
+//			sendKeys(customStatusTitle, prop.getProperty("CustomStatus"), "Custom Title");
+//			hideKeyboard();
+//			tapOn("CustomTime", custom);
+//			timePicker(prop.getProperty("TimePickerHour"));
+//			tapOn("Done", statusDone);
+//			assertEquals(otherStatuses, "On leave indefinitely", "Verified 'On leave indefinitely' successfully");
+//		} catch (Exception e) {
+//			test.log(LogStatus.FAIL, "Custom is failed");
+//
+//		}
 
 	}
 }
