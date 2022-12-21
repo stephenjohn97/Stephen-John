@@ -59,8 +59,8 @@ public class AutomationTest {
 	public static ExtentReports reports = new ExtentReports("AC_report.html");
 	public static ExtentTest test;
 	public static List<String> testClasses = new ArrayList<String>();
-	public static String userName = "johnsteve_XsiamS";
-	public static String accessKey = "DxbJ2pQVARdSrVdYiKSs";
+	public static String userName = "stephenjohn_kgXWTI";
+	public static String accessKey = "LW12ajdZ1xMzE4van3Sv";
 	DesiredCapabilities capabilities;
 
 	public static void main(String[] args) throws IOException, GeneralSecurityException, InterruptedException {
@@ -128,15 +128,17 @@ public class AutomationTest {
 				driver = new AndroidDriver<AndroidElement>(new URL("http://0.0.0.0:4723/wd/hub"), capabilities);
 				driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 			} else if (prop.getProperty("deviceType").equalsIgnoreCase("Cloud")) {
-				capabilities.setCapability("device", "Google Pixel 5");
-				capabilities.setCapability("os_version", "12.0");
+				capabilities.setCapability("device", "Google Pixel 6 Pro");
+				capabilities.setCapability("os_version", "13.0");
 				capabilities.setCapability("project", "My AC Project");
 				capabilities.setCapability("build", "My AC Build");
 				capabilities.setCapability("name", "Bstack-[Java] Sample Test");
-				capabilities.setCapability("app", "bs://3bc6e0121b7c7565223c9ecf6732188eaa85bd17");
+				capabilities.setCapability("app", "bs://190ae459fb5bef7a17ceadb419092cd54a93ee34");
 				capabilities.setCapability("autoGrantPermissions", true);
 				capabilities.setCapability("autoAcceptAlerts", true);
-				capabilities.setCapability("newCommandTimeout", 180);
+				capabilities.setCapability("noReset", false);
+				capabilities.setCapability("fullReset", true);
+				capabilities.setCapability("newCommandTimeout", 120);
 				driver = new AndroidDriver<AndroidElement>(
 						new URL("https://" + userName + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub"),
 						capabilities);
