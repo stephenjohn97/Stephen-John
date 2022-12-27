@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -97,6 +98,19 @@ public class AutomationTest {
 		}
 	}
 
+	public AppiumDriverLocalService startServer() {
+		HashMap<String, String> envi = new HashMap<>(); 
+		envi.put("PATH", "/usr/local/bin:" + System.getenv("PATH"));
+		AppiumServiceBuilder builder = new AppiumServiceBuilder();
+		builder.withAppiumJS(new File(
+				"/Applications/Appium Server GUI.app/Contents/Resources/app/node_modules/appium/build/lib/main.js"));
+		builder.usingDriverExecutable(new File("/usr/local/bin/node"));
+		builder.usingPort(4723);
+		builder.withEnvironment(envi);
+		builder.withLogFile(new File("Logs.txt"));
+		return AppiumDriverLocalService.buildService(builder);
+	}
+
 	@BeforeTest
 	public void launchApp() throws InterruptedException, IOException {
 		try {
@@ -128,6 +142,7 @@ public class AutomationTest {
 				driver = new AndroidDriver<AndroidElement>(new URL("http://0.0.0.0:4723/wd/hub"), capabilities);
 				driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 			} else if (prop.getProperty("deviceType").equalsIgnoreCase("Cloud")) {
+				startServer().start();
 				capabilities.setCapability("device", "Google Pixel 6 Pro");
 				capabilities.setCapability("os_version", "13.0");
 				capabilities.setCapability("project", "My AC Project");
@@ -284,7 +299,7 @@ public class AutomationTest {
 
 	@AfterSuite
 	public void tearDown() throws Exception {
-
+		startServer().stop();
 		reports.endTest(test);
 		reports.flush();
 		System.out.println("INFO - ###################################");
